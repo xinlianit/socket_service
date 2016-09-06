@@ -20,7 +20,7 @@ return array(
     
     //redis配置
     'REDIS' => array(
-        'HOST'      => '192.168.3.102',
+        'HOST'      => '192.168.3.98',
         'PORT'      => '6379',
         'AUTH'      => 'redis123',
         'PREFIX'    => 'msc::socket::',
