@@ -1,32 +1,53 @@
 <!DOCTYPE html>
-<html xmlns="http://www.w3.org/1999/xhtml">
-<head>
-    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
-	<meta content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" name="viewport">
-    <title>账户登录</title>
-<style type="text/css">
-.main{border:1px solid #d7d7d7;}
-.main ul{list-style:none;margin:0px;padding:0px;}
-.main ul .list{padding:10px;}
-.listbr{border-top:1px solid #D7D7D7;}
-.main ul .list .left,.main ul .list .center,.main ul .list .right{display:inline-block;margin:0px;height:45px;line-height:45px;}
-.main ul .list .left{width:24%;}
-.main ul .list .center{width:20%;text-align:center;color:red;}
-.main ul .list .right{width:50%;text-align:right;}
-.main ul .list h3{margin:0px;}
-.tips{float:left;line-height:20px;margin-top:-15px;}
-</style>
-</head>
-<body>
-	<div class="main">
-		<form action="" method="post">
-			<ul id="list_c">
-				<li>
-					<span>商户ID：</span>
-					<input type="text" name="shop_code" value="" />
-				</li>
-			</ul>
-		</form>
-	</div>
-</body>
+<html>
+
+	<head>
+		<meta charset="utf-8">
+		<title>账户登录</title>
+		<meta name="viewport" content="width=device-width, initial-scale=1,maximum-scale=1,user-scalable=no">
+		<meta name="apple-mobile-web-app-capable" content="yes">
+		<meta name="apple-mobile-web-app-status-bar-style" content="black">
+		<?php include_once 'Include/head.php';?>
+	</head>
+
+	<body>
+		<div class="mui-content">
+			<div class="mui-content-padded">
+				<form class="mui-input-group login" name="member" ng-app="member" ng-controller="login" novalidate>
+			    	<div class="login-msg">
+			    		<span ng-show="member.shopcode.$dirty && member.shopcode.$invalid">
+				    		<span ng-show="member.shopcode.$error.required">商户ID必须</span>
+				    	</span>
+				    	<span ng-show="member.account.$dirty && member.account.$invalid">
+				    		<span ng-show="member.account.$error.required">用户名必须</span>
+				    	</span>
+				    	<span ng-show="member.passwd.$dirty && member.passwd.$invalid">
+				    		<span ng-show="member.passwd.$error.required">密码必须</span>
+				    	</span>
+			    	</div>
+				    <div class="mui-input-row">
+				        <label>商户ID：</label>
+				    	<input type="text" class="mui-input-clear" placeholder="请输入商户ID" name="shopcode" ng-model="shopcode" required>
+			    	</div>
+				    <div class="mui-input-row">
+				        <label>用户名：</label>
+				    <input type="text" name="account" ng-model="account" class="mui-input-clear" placeholder="请输入用户名" required>
+				    </div>
+				    <div class="mui-input-row">
+				        <label>密码：</label>
+				        <input type="password" name="passwd" ng-model="passwd" class="mui-input-password" placeholder="请输入密码" required>
+				    </div>
+				    <div class="mui-button-row">
+				        <button type="button" ng-click="submit_login()" class="mui-btn mui-btn-primary" ng-disabled="member.shopcode.$error.required || member.account.$error.required || member.passwd.$error.required || member.shopcode.$dirty && member.shopcode.$invalid || member.account.$dirty && member.account.$invalid || member.passwd.$dirty && member.passwd.$invalid">确认</button>
+				    </div>
+				    
+				</form>
+			</div>
+		</div>
+		<?php include_once 'Include/comm.php';?>
+		<script type="text/javascript" src="static/js/angular_test.js">
+			
+		</script>
+	</body>
+
 </html>
