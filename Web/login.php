@@ -7,7 +7,10 @@
 		<meta name="viewport" content="width=device-width, initial-scale=1,maximum-scale=1,user-scalable=no">
 		<meta name="apple-mobile-web-app-capable" content="yes">
 		<meta name="apple-mobile-web-app-status-bar-style" content="black">
-		<?php include_once 'Include/head.php';?>
+		<link rel="stylesheet" href="static/css/mui.min.css">
+		<link rel="stylesheet" href="static/css/app.css">
+	
+		<script data-main="static/js/app" src="static/js/require.js" defer async="true"></script>
 	</head>
 
 	<body>
@@ -38,16 +41,12 @@
 				        <input type="password" name="passwd" ng-model="passwd" class="mui-input-password" placeholder="请输入密码" required>
 				    </div>
 				    <div class="mui-button-row">
-				        <button type="button" ng-click="submit_login()" class="mui-btn mui-btn-primary" ng-disabled="member.shopcode.$error.required || member.account.$error.required || member.passwd.$error.required || member.shopcode.$dirty && member.shopcode.$invalid || member.account.$dirty && member.account.$invalid || member.passwd.$dirty && member.passwd.$invalid">确认</button>
+				        <button type="button" id="log" class="mui-btn mui-btn-primary" ng-disabled="member.shopcode.$error.required || member.account.$error.required || member.passwd.$error.required || member.shopcode.$dirty && member.shopcode.$invalid || member.account.$dirty && member.account.$invalid || member.passwd.$dirty && member.passwd.$invalid">确认</button>
 				    </div>
 				    
 				</form>
 			</div>
 		</div>
-		<?php include_once 'Include/comm.php';?>
-		<script type="text/javascript" src="static/js/angular_test.js">
-			
-		</script>
 	</body>
 
 </html>

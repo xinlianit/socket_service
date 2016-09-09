@@ -3,82 +3,22 @@
 <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
 	<meta content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" name="viewport">
-    <title>电视端排队概览</title>
-<style type="text/css">
-.main{border:1px solid #d7d7d7;}
-.main ul{list-style:none;margin:0px;padding:0px;}
-.main ul .list{padding:10px;}
-.listbr{border-top:1px solid #D7D7D7;}
-.main ul .list .left,.main ul .list .center,.main ul .list .right{display:inline-block;margin:0px;height:45px;line-height:45px;}
-.main ul .list .left{width:24%;}
-.main ul .list .center{width:20%;text-align:center;color:red;}
-.main ul .list .right{width:50%;text-align:right;}
-.main ul .list h3{margin:0px;}
-.tips{float:left;line-height:20px;margin-top:-15px;}
-</style>
+    <title>排队系统</title>
+	<script type="text/javascript">
+		var token = localStorage.getItem('pai_staff_token');
+		if( token != null ) {
+			window.location.href = 'queue.html';
+		}else{
+			window.location.href = 'login.php';
+		}
+		
+	</script>
 </head>
 <body>
 	<div class="main">
 		<ul id="list_c"></ul>
 	</div>
 </body>
-<script type="text/javascript">
-	//创建webSocket连接
-	var ws = new WebSocket('ws://192.168.3.100:3456');
-	//监听连接成功
-	ws.onopen = function(){
-	    var uid = '0079ejdeckld7e9e8de00we8d0ew';
-	    ws.send(uid);
-	};
-	//监听数据
-	ws.onmessage = function(e){
-	    var data = JSON.parse(e.data);
-	    console.log(data);
-	    var html = '';
-	    
-	    for(var i in data.list){
-	    	var class_id = (i == 0) ? '' : 'listbr';
-	    	
-	    	var nowNum = data.list[i].nowNum;
-	    	if( nowNum == '' || nowNum == 0 ){
-	    		nowNum = '—';
-	    	}
-	    	
-	    	var loadCount = data.list[i].loadCount;
-	    	if( loadCount == '' || loadCount == 0 )
-	    		loadCount = '—';
-	    	else
-	    		loadCount+= '桌';
-	    	html +='<li class="list '+class_id+'">' +
-						'<div class="left">' +
-							'<h3>'+data.list[i].name+'</h3>' +
-							'<span class="tips">'+data.list[i].people+'</span>' +
-						'</div>' +
-						'<div class="center">' +
-							'<h3>'+nowNum+'</h3>' +
-						'</div>' +
-						'<div class="right">' +
-							'<span>当前排队:'+loadCount+'</span>' +
-						'</div>' +
-					'</li>';
-	    }
-	    
-	    if( html == '' )
-	    	html = '<li class="list" style="border:none;"><div style="height:100px;line-height:100px;text-align:center;">暂无排队数据！</div></li>';
-	    
-	    document.getElementById("list_c").innerHTML = html;
-	    
-	};
-	//监听失败
-	ws.onerror = function(e){
-		alert("连接失败：" + JSON.stringify(e));
-	};
-	//监听关闭
-	ws.onclose = function(e){
-		alert("连接关闭：" + JSON.stringify(e));
-	}
-
-</script>
 </html>
 
 
