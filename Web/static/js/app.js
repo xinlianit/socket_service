@@ -18,10 +18,36 @@ require.config({
 	},
 });
 
-//模块加载完毕
-require(['angular','member','mui','zepto'],function(angular,member){
-	//调用登录
-	var token = localStorage.getItem('pai_staff_token');
-	if( token == null )
-		member.login(angular);
-});
+//path_info
+var url = window.location.href;
+var path_info = url.split('/');
+var action = path_info.pop();
+
+//登录验证
+var token = localStorage.getItem('pai_staff_token');
+if( action == 'login.php' ){
+	if( token != null ) {
+		window.location.href = 'queue.html';
+	}
+}else{
+	if( token === null ) {
+		window.location.href = 'login.php';
+	}
+}
+
+var staff_info = localStorage.getItem('pai_staff_info');
+if( staff_info != null ){
+	staff_info = JSON.parse( staff_info );
+}
+
+switch( action ){
+	//登录
+	case 'login.php':
+		require(['../login']);
+	break;
+	//排队
+	case 'queue.html':
+		require(['../queue']);
+	break;
+}
+

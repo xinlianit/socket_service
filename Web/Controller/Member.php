@@ -1,6 +1,11 @@
 <?php
 header("Content-type: text/html; charset=utf-8");
+define('ROOT_PATH', str_replace('/Web/Controller', '', __DIR__ ));
+use \Lib\Curl;
+require_once ROOT_PATH . '/Lib/Curl.class.php';
 
+//数据请求服务器
+define('REQUEST_SERVICE' , 'http://api.msp.my');
 @$action = $_GET['action'];
 
 $data = file_get_contents("php://input");
@@ -17,22 +22,9 @@ switch( $action ){
 				'passwd'		=> $post ? $post['passwd'] : '',
 			);
 			
-			//初始化curl
-			$cul = curl_init();
-			//curl提交地址
-			curl_setopt( $cul , CURLOPT_URL , $url );
-			//设置返回值
-			curl_setopt( $cul , CURLOPT_RETURNTRANSFER , 1 );
-			//提交数据
-			curl_setopt( $cul , CURLOPT_POST , 1 );
-			curl_setopt( $cul , CURLOPT_POSTFIELDS , $post_data );
+			$login_rs = Curl::getIns(REQUEST_SERVICE.'/Member/login')->post( $post_data );
 			
-			//执行curl
-			$output = curl_exec( $cul );
-			//关闭curl
-			curl_close( $cul );
-			
-			echo($output);die;
+			echo($login_rs);die;
 		}
 		break;
 	default:

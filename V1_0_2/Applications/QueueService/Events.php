@@ -20,6 +20,15 @@
 //declare(ticks=1);
 
 use \GatewayWorker\Lib\Gateway;
+use \Lib\Curl;
+
+//根路径
+define('ROOT_PATH', str_replace('/V1_0_2/Applications/QueueService', '', __DIR__ ));
+//数据请求服务器
+define('REQUEST_SERVICE' , 'http://api.msp.my');
+
+require_once ROOT_PATH . '/Lib/Curl.class.php';
+require_once ROOT_PATH . '/Lib/RedisService.class.php';
 
 /**
  * 主逻辑
@@ -29,17 +38,21 @@ use \GatewayWorker\Lib\Gateway;
 class Events
 {
     /**
+     * redis资源
+     * @var unknown
+     */
+    private static $redis;
+    
+    public function __construct(){
+        self::$redis = new Lib\RedisService('192.168.3.100','6379','redis123');    
+    }
+    /**
      * 当客户端连接时触发
      * 如果业务不需此回调可以删除onConnect
      * 
      * @param int $client_id 连接id
      */
-    public static function onConnect($client_id) {
-        // 向当前client_id发送数据 
-        Gateway::sendToClient($client_id, "Hello $client_id");
-        // 向所有人发送
-        Gateway::sendToAll("$client_id login");
-    }
+    public static function onConnect($client_id) {}
     
    /**
     * 当客户端发来消息时触发
@@ -47,8 +60,47 @@ class Events
     * @param mixed $message 具体消息
     */
    public static function onMessage($client_id, $message) {
-        // 向所有人发送 
-        Gateway::sendToAll("$client_id said $message");
+       $data = json_decode( $message , true );
+       
+       
+       switch($data['action']){
+           //心跳包
+           case 'pong':
+               //输出日志
+               echo date('Y-m-d H:i:s',time()) . "客户端心跳：" . $message."\n";
+               break;
+           //登录
+           case 'login':
+               //输出日志
+               echo date('Y-m-d H:i:s',time()) . "登录用户：" . $message."\n";
+               //验证登录有效性
+               $login_info = Curl::getIns(REQUEST_SERVICE . '/Member/getLoginInfo')->post( array('token'=>$data['token']) );
+               $login_info = json_decode($login_info , true);
+               if( $login_info['statusCode'] != 1 ){
+                   //输出日志
+                   echo date('Y-m-d H:i:s',time()) . "登录失败：" . $message.";原因：".$login_info['statusMsg']."\n";
+                   //通知客户端重新登录
+                   Gateway::sendToClient($client_id, '{"statusCode":"-1","statusMsg":"登录信息过期"}');
+                   //关闭客户端连接
+                   Gateway::closeClient($client_id);
+                   echo date('Y-m-d H:i:s',time()) . "关闭连接：" . $message."\n";
+                   return ;
+               }
+               
+               //绑定的UID
+               Gateway::bindUid($client_id, $login_info['result']['shopid']);
+               
+               //获取排队数据
+               $queue_data = Curl::getIns(REQUEST_SERVICE . '/Teevee/overview')->post( array('token'=>$data['token']) );
+               //$queue_data = self::$redis->
+               $data = json_decode($queue_data,true);
+               $data['type'] = 'queue';
+               
+               //发送数据
+               Gateway::sendToUid($login_info['result']['shopid'],json_encode($data));
+               break;
+       }
+       
    }
    
    /**
@@ -56,7 +108,6 @@ class Events
     * @param int $client_id 连接id
     */
    public static function onClose($client_id) {
-       // 向所有人发送 
-       GateWay::sendToAll("$client_id logout");
+       echo date('Y-m-d H:i:s',time()) . "客户端断开连接：" . $client_id."\n";
    }
 }
