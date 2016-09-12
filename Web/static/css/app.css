@@ -21,8 +21,17 @@
 	margin:20px 0px;
 }
 .login-msg{
-	color:red;
+	color:1px solid red;
 	height:25px;
 	line-height:25px;
 	text-align:center;
+}
+
+/* 排队列表 */
+.mui-control-content {
+	background-color: white;
+	min-height: 215px;
+}
+.mui-control-content .mui-loading {
+	margin-top: 50px;
 }

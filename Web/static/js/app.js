@@ -49,5 +49,9 @@ switch( action ){
 	case 'queue.html':
 		require(['../queue']);
 	break;
+	//排队列表
+	case 'queue_list.html':
+		require(['../queue_list']);
+	break;
 }
 

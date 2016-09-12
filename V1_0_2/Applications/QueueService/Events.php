@@ -21,11 +21,10 @@
 
 use \GatewayWorker\Lib\Gateway;
 use \Lib\Curl;
+use \Lib\RedisService;
 
 //根路径
 define('ROOT_PATH', str_replace('/V1_0_2/Applications/QueueService', '', __DIR__ ));
-//数据请求服务器
-define('REQUEST_SERVICE' , 'http://api.msp.my');
 
 require_once ROOT_PATH . '/Lib/Curl.class.php';
 require_once ROOT_PATH . '/Lib/RedisService.class.php';
@@ -38,14 +37,25 @@ require_once ROOT_PATH . '/Lib/RedisService.class.php';
 class Events
 {
     /**
-     * redis资源
-     * @var unknown
+     * @desc Redis配置
+     * @var array
      */
-    private static $redis;
+    private $redis_config = array();
+    
+    /**
+     * @desc 数据接口
+     * @var string
+     */
+    private $api_server = 'http://127.0.0.1';
     
     public function __construct(){
-        self::$redis = new Lib\RedisService('192.168.3.100','6379','redis123');    
+        $config = include_once ROOT_PATH . '/Config/config.php';
+        if( !empty($config['REDIS']) )
+            $this->redis_config = $config['REDIS'];
+        if( $config['API_HOST'] )
+            $this->api_server = $config['API_HOST'];
     }
+    
     /**
      * 当客户端连接时触发
      * 如果业务不需此回调可以删除onConnect
@@ -74,7 +84,7 @@ class Events
                //输出日志
                echo date('Y-m-d H:i:s',time()) . "登录用户：" . $message."\n";
                //验证登录有效性
-               $login_info = Curl::getIns(REQUEST_SERVICE . '/Member/getLoginInfo')->post( array('token'=>$data['token']) );
+               $login_info = Curl::getIns($this->api_server . '/Member/getLoginInfo')->post( array('token'=>$data['token']) );
                $login_info = json_decode($login_info , true);
                if( $login_info['statusCode'] != 1 ){
                    //输出日志
@@ -87,17 +97,24 @@ class Events
                    return ;
                }
                
+               //UID商家ID
+               $shop_id = $login_info['result']['shopid'];
+               
                //绑定的UID
-               Gateway::bindUid($client_id, $login_info['result']['shopid']);
+               Gateway::bindUid($client_id, $shop_id);
                
                //获取排队数据
-               $queue_data = Curl::getIns(REQUEST_SERVICE . '/Teevee/overview')->post( array('token'=>$data['token']) );
-               //$queue_data = self::$redis->
+               $queue_data = RedisService::instance( $this->redis_config['HOST'] , $this->redis_config['PORT'] , $this->redis_config['AUTH'] )->get($this->redis_prefix . date('Ymd',time()) . "::" . $shop_id);
+               
+               if( !$queue_data ){
+                   //获取默认排队显示
+                   $queue_data = Curl::getIns($this->api_server . '/Teevee/overview')->post( array('token'=>$data['token']) );
+               }
                $data = json_decode($queue_data,true);
                $data['type'] = 'queue';
                
                //发送数据
-               Gateway::sendToUid($login_info['result']['shopid'],json_encode($data));
+               Gateway::sendToUid($shop_id , json_encode($data));
                break;
        }
        
