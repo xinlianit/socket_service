@@ -19,7 +19,7 @@ use \Workerman\Autoloader;
 require_once __DIR__ . '/../../Workerman/Autoloader.php';
 Autoloader::setRootPath(__DIR__);
 
-$config = include_once __DIR__ . '/../../../Config/config.php';
+$config = include __DIR__ . '/../../../Config/config.php';
 
 
 // bussinessWorker 进程

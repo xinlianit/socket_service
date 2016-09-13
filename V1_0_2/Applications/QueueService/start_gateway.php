@@ -19,7 +19,7 @@ use \Workerman\Autoloader;
 require_once __DIR__ . '/../../Workerman/Autoloader.php';
 Autoloader::setRootPath(__DIR__);
 
-$config = include_once __DIR__ . '/../../../Config/config.php';
+$config = include __DIR__ . '/../../../Config/config.php';
 
 // gateway 进程，这里使用Text协议，可以用telnet测试
 $gateway = new Gateway($config['QUEUE_IO_SERVER'] ? $config['QUEUE_IO_SERVER'] : "Websocket://0.0.0.0:3456");

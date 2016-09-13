@@ -29,6 +29,8 @@ define('ROOT_PATH', str_replace('/V1_0_2/Applications/QueueService', '', __DIR__
 require_once ROOT_PATH . '/Lib/Curl.class.php';
 require_once ROOT_PATH . '/Lib/RedisService.class.php';
 
+$config = include ROOT_PATH . '/Config/config.php';
+
 /**
  * 主逻辑
  * 主要是处理 onConnect onMessage onClose 三个方法
@@ -36,26 +38,6 @@ require_once ROOT_PATH . '/Lib/RedisService.class.php';
  */
 class Events
 {
-    /**
-     * @desc Redis配置
-     * @var array
-     */
-    private $redis_config = array();
-    
-    /**
-     * @desc 数据接口
-     * @var string
-     */
-    private $api_server = 'http://127.0.0.1';
-    
-    public function __construct(){
-        $config = include_once ROOT_PATH . '/Config/config.php';
-        if( !empty($config['REDIS']) )
-            $this->redis_config = $config['REDIS'];
-        if( $config['API_HOST'] )
-            $this->api_server = $config['API_HOST'];
-    }
-    
     /**
      * 当客户端连接时触发
      * 如果业务不需此回调可以删除onConnect
@@ -70,9 +52,8 @@ class Events
     * @param mixed $message 具体消息
     */
    public static function onMessage($client_id, $message) {
+       $config = include ROOT_PATH . '/Config/config.php';
        $data = json_decode( $message , true );
-       
-       
        switch($data['action']){
            //心跳包
            case 'pong':
@@ -84,7 +65,7 @@ class Events
                //输出日志
                echo date('Y-m-d H:i:s',time()) . "登录用户：" . $message."\n";
                //验证登录有效性
-               $login_info = Curl::getIns($this->api_server . '/Member/getLoginInfo')->post( array('token'=>$data['token']) );
+               $login_info = Curl::getIns($config['API_HOST'] . '/Member/getLoginInfo')->post( array('token'=>$data['token']) );
                $login_info = json_decode($login_info , true);
                if( $login_info['statusCode'] != 1 ){
                    //输出日志
@@ -104,11 +85,11 @@ class Events
                Gateway::bindUid($client_id, $shop_id);
                
                //获取排队数据
-               $queue_data = RedisService::instance( $this->redis_config['HOST'] , $this->redis_config['PORT'] , $this->redis_config['AUTH'] )->get($this->redis_prefix . date('Ymd',time()) . "::" . $shop_id);
+               $queue_data = RedisService::instance( $config['REDIS']['HOST'] , $config['REDIS']['PORT'] , $config['REDIS']['AUTH'] )->get($config['REDIS']['PREFIX'] . date('Ymd',time()) . "::" . $shop_id);
                
                if( !$queue_data ){
                    //获取默认排队显示
-                   $queue_data = Curl::getIns($this->api_server . '/Teevee/overview')->post( array('token'=>$data['token']) );
+                   $queue_data = Curl::getIns($config['API_HOST'] . '/Teevee/overview')->post( array('token'=>$data['token']) );
                }
                $data = json_decode($queue_data,true);
                $data['type'] = 'queue';

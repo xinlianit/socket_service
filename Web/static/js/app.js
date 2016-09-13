@@ -39,7 +39,6 @@ var staff_info = localStorage.getItem('pai_staff_info');
 if( staff_info != null ){
 	staff_info = JSON.parse( staff_info );
 }
-
 switch( action ){
 	//登录
 	case 'login.php':

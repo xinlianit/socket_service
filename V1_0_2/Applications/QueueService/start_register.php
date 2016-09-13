@@ -17,7 +17,7 @@ use \GatewayWorker\Register;
 // 自动加载类
 require_once __DIR__ . '/../../Workerman/Autoloader.php';
 
-$config = include_once __DIR__ . '/../../../Config/config.php';
+$config = include __DIR__ . '/../../../Config/config.php';
 
 // register 服务必须是text协议
 $register = new Register($config['REGISTER_SERVER'] ? $config['REGISTER_SERVER'] : 'Text://0.0.0.0:1234');

@@ -3,6 +3,8 @@
  * 在实际项目开发时，建议为App单独写一个css文件，从而实现项目的自定义皮肤功能；
  * 
  * */
+html,body{height:100%;}
+.queu-loading{margin:0px;padding:0px;}
 .mui-content{
 	display: table;
 }
@@ -28,10 +30,16 @@
 }
 
 /* 排队列表 */
+.queue-content,.queue-content .mui-slider,.queue-content .mui-slider .mui-slider-group{height:100%;}
+
 .mui-control-content {
 	background-color: white;
 	min-height: 215px;
 }
 .mui-control-content .mui-loading {
-	margin-top: 50px;
+	margin: 50% auto;
+}
+.row-not-data{
+	text-align:center;
+	margin:50% auto;
 }

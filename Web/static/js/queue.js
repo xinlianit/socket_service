@@ -15,6 +15,7 @@ require(['mui'],function(){
 		
 		//心跳回应
 		if(data.type && data.type == 'ping'){
+			console.log(data);
 			ws.send('{"action":"pong"}');
 		}
 		

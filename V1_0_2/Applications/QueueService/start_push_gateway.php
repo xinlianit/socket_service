@@ -9,7 +9,7 @@ use \Workerman\Autoloader;
 //自动加载
 require_once __DIR__ . '/../../Workerman/Autoloader.php';
 
-$config = include_once __DIR__ . '/../../../Config/config.php';
+$config = include __DIR__ . '/../../../Config/config.php';
 
 // gateway 进程，这里使用Text协议
 $gateway = new Gateway($config['QUEUE_PUSH_SERVER'] ? $config['QUEUE_PUSH_SERVER'] : "Text://0.0.0.0:2345");
