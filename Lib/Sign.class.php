@@ -16,25 +16,25 @@ class Sign {
      * @desc 签名密钥
      * @var string
      */
-    private static $secret_key = null;
+    private $secret_key = null;
     
     /**
      * @desc 加密计算盐值
      * @var string
      */
-    private static $slat = null;
+    public static $slat = null;
     
     /**
      * @desc 秘钥键名
      * @var string
      */
-    private static $secret_key_name = 'key';
+    private $secret_key_name = 'key';
     
     /**
      * @desc 签名键名
      * @var string
      */
-    private static $sign_key_name = 'sign';
+    private $sign_key_name = 'sign';
     
     /**
      * @desc 编译签名函数;md5|crypt|sha1|base64_encode
@@ -44,11 +44,11 @@ class Sign {
     
     public function __construct($secret_key , $sign_key_name , $secret_key_name){
         if( isset( $secret_key ) ) 
-            self::$secret_key               = $secret_key;
+            $this->secret_key               = $secret_key;
         if( isset($sign_key_name) )
-            self::$sign_key_name            = $sign_key_name;
+            $this->sign_key_name            = $sign_key_name;
         if( isset($secret_key_name) )
-            self::$secret_key_name          = $secret_key_name;
+            $this->secret_key_name          = $secret_key_name;
     }
     
     /**
@@ -74,12 +74,12 @@ class Sign {
         $sign_str = '';
         foreach( $data as $k => $v ){
             //过滤签名、空值、数组
-            if( $k != self::$sign_key_name && $v != '' && !is_array($v) )
+            if( $k != $this->sign_key_name && $v != '' && !is_array($v) )
                 $sign_str .= $k . '=' . html_entity_decode( $v ) . '&';
         }
         
         //拼接密钥
-        $sign_str .= self::$secret_key_name . '=' . self::$secret_key;
+        $sign_str .= $this->secret_key_name . '=' . $this->secret_key;
         
         return $sign_str;
     }
