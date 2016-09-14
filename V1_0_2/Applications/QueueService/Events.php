@@ -54,6 +54,7 @@ class Events
    public static function onMessage($client_id, $message) {
        $config = include ROOT_PATH . '/Config/config.php';
        $data = json_decode( $message , true );
+       
        switch($data['action']){
            //心跳包
            case 'pong':
@@ -96,6 +97,11 @@ class Events
                
                //发送数据
                Gateway::sendToUid($shop_id , json_encode($data));
+               break;
+           //叫号
+           case 'callnumber':
+               echo "推送消息：".json_encode($data)."\n";
+               Gateway::sendToUid($data['shopid'] , json_encode($data));
                break;
        }
        

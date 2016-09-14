@@ -28,6 +28,8 @@ return array(
     'IO_NODE_ADDRESS'           => '192.168.3.100',
     //push服务节点地址
     'PUSH_NODE_ADDRESS'         => '192.168.3.100',
+    //push服务地址
+    'PUSH_NODE_ADDRESS_PORT'    => '192.168.3.100:2345',
     
     ##################### 服务进程数 ########################
     //注册服务进程数
@@ -60,7 +62,7 @@ return array(
     'RUNTIME_LOG_SAVE'           => '/tmp/msc_pai_socket_service_run.log',
     
     //是否开启心跳监测
-    'HEART_OPEN'                 => true,
+    'HEART_OPEN'                 => false,
     //心跳间隔（单位：秒s）
     'HEART_INTERVAL'             => 10,
     

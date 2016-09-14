@@ -38,7 +38,7 @@
 						<ul class="mui-table-view" ng-hide="item1_list">
 							<li class="mui-table-view-cell" ng-repeat="ql in queue_list">
 							 	<span>{{ql.queueCode}}</span>
-							 	<span style="float:right;"><button type="button" class="mui-btn mui-btn-danger">叫号</button></span>
+							 	<span style="float:right;"><button type="button" class="mui-btn mui-btn-danger" ng-click="callnum(dl.dkId,ql.queueCode)">叫号</button></span>
 							 </li>
 						</ul>
 						
@@ -82,8 +82,21 @@
 						mui.toast("服务器错误，请稍后再试！");
 					});
 					
+					//叫号
+					$scope.callnum = function(dkId,callNum){
+						$http({
+							method:'post',
+							url:'Controller/Queue.php?action=callNumber',
+							data:{"token":"6285afa7882d94f93d722625a08dbfb6","dkId":dkId,"callNum":callNum},
+						}).success(function(result){
+							mui.toast("叫号成功");
+						}).error(function(e){
+							mui.toast("叫号失败");
+						});
+					}
+					
 			});
-
+			
 		</script>
 	</body>
 </html>
