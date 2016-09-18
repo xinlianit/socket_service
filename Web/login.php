@@ -28,7 +28,7 @@
 				    		<span ng-show="member.passwd.$error.required">密码必须</span>
 				    	</span>
 			    	</div>
-				    <div class="mui-input-row">
+				     <div class="mui-input-row">
 				        <label>商户ID：</label>
 				    	<input type="text" class="mui-input-clear" placeholder="请输入商户ID" name="shopcode" ng-model="shopcode" required>
 			    	</div>
