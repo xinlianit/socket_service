@@ -21,13 +21,13 @@ class Encrypt {
      * 加密字节
      * @var integer
      */
-    private $_bit = 256;
+    private $_bit = MCRYPT_RIJNDAEL_256;
     
     /**
      * 加密模式
      * @var string
      */
-    private $_mode = 'CBC';
+    private $_mode = MCRYPT_MODE_ECB;
     
     /**
      * base64二次加密
@@ -75,7 +75,11 @@ class Encrypt {
         //AES加密设置
         if( $this->type == 'AES' ){
             //允许设置的字节
-            $allow_set_bits = array( 128 , 192 , 256 );
+            $allow_set_bits = array( 
+                128     => MCRYPT_RIJNDAEL_128, 
+                192     => MCRYPT_RIJNDAEL_192 , 
+                256     => MCRYPT_RIJNDAEL_256 
+            );
             
             //允许设置加密模式
             $allow_set_modes = array( 
@@ -88,19 +92,22 @@ class Encrypt {
             );
             
             //设置加密字节
-            if( in_array( $param['bit'] , $allow_set_bits ) )
-                $this->_bit     = $param['bit'];
+            if( array_key_exists( 'bit' , $param ) && array_key_exists( $param['bit'] , $allow_set_bits ) )
+                $this->_bit     = $allow_set_bits[$param['bit']];
             
             //设置加密模式
-            if( array_key_exists( strtoupper($this->_mode) , $allow_set_modes ) )
-                $this->_mode = $allow_set_modes[$this->_mode];
+            if( array_key_exists( 'mode' , $param) ){
+                $_mode = strtoupper($param['mode']);
+                if( array_key_exists( $_mode , $allow_set_modes ) )
+                    $this->_mode = $allow_set_modes[$_mode];
+            }
             
             //设置是否使用base64二次加密
-            if( !$param['base64'] )
+            if( array_key_exists( 'base64' , $param ) && !$param['base64'] )
                 $this->_use_base64 = false;
-            
+                
             $this->_iv_size = mcrypt_get_iv_size( $this->_bit , $this->_mode );
-            $this->_iv      = mcrypt_create_iv( $this->_iv_size );
+            $this->_iv      = mcrypt_create_iv( $this->_iv_size , MCRYPT_RAND );
         }
             
         //RSA加密设置
@@ -138,7 +145,7 @@ class Encrypt {
                 $encode_result = $this->aesEncode( $data );
                 break;
             case 'RSA':
-                $encode_result = '';
+                $encode_result = $this->rsaEncode( $data );
                 break;
         }
         return $encode_result;
@@ -160,7 +167,7 @@ class Encrypt {
                 $encode_result = $this->aesDecode( $data );
                 break;
             case 'RSA':
-                $encode_result = '';
+                $encode_result = $this->rsaDecode( $data );
                 break;
         }
         return $encode_result;
@@ -173,13 +180,16 @@ class Encrypt {
      */
     private function aesEncode($data){
         if( $this->_mode === MCRYPT_MODE_ECB )
-            $encode_str = mcrypt_encrypt( $this->_bit , self::$secret_key , $data );
+            $encode_str = mcrypt_encrypt( $this->_bit , self::$secret_key , $data , $this->_mode );
         else
-            $encode_str = mcrypt_encrypt( $this->_bit , self::$secret_key , $data , $this->_iv );
+            $encode_str = mcrypt_encrypt( $this->_bit , self::$secret_key , $data , $this->_mode , $this->_iv );
+        
+        //十六进制流转字符串    
+        $encode_str = $this->hexToString( $encode_str );
         
         if( $this->_use_base64 )
             $encode_str     = base64_encode($encode_str);
-        
+            
         return $encode_str;
     }
     
@@ -190,7 +200,11 @@ class Encrypt {
      */
     private function aesDecode($data){
         if( $this->_use_base64 )
-            $string = base64_decode( $data );
+            $data = base64_decode( $data );
+            
+        //字符串转十六进制流
+        $data = $this->stringToHex( $data );
+            
         if( $this->_mode === MCRYPT_MODE_ECB )
             $decode_string = mcrypt_decrypt( $this->_bit , self::$secret_key , $data , $this->_mode );
         else 
@@ -199,13 +213,52 @@ class Encrypt {
         return $decode_string;
     }
     
-    private function rsaEncode(){
-        
+    /**
+     * RSA加密
+     * @param string $data      加密数据
+     * @return string
+     */
+    private function rsaEncode($data){
+        return "ff";
     }
     
-    private function rsaDecode(){
-        
+    /**
+     * RSA解密
+     * @param string $data      解密数据
+     * @return string
+     */
+    private function rsaDecode($data){
+        return "aa";
     }
     
+    /**
+     * 十六进制流转字符串
+     * @param string $string    十六进制流 
+     * @return string
+     */
+    private function hexToString($string){
+        $buf = '';
+        for ( $i = 0; $i < strlen($string); $i++ ){
+            $val = dechex( ord( $string{$i} ) );
+            if( strlen($val) < 2)
+                $val = '0' . $val;
+                $buf .= $val;
+        }
+        return $buf;
+    }
+    
+    /**
+     * 字符串转十六进制流
+     * @param string $string    字符串 
+     * @return string
+     */
+    private function stringToHex($string){
+        $buf = '';
+        for( $i = 0; $i < strlen($string); $i += 2 ){
+            $val = chr(hexdec(substr($string , $i , 2)));
+            $buf .= $val;
+        }
+        return $buf;
+    }
 }
 ?>
